@@ -11,7 +11,6 @@ import java.util.List;
 
 public class CommandLineAdapter {
 
-
     Board board = new BoardImpl(100);
     Dice dice = new DiceImpl(6);
     List<Player> players = new ArrayList<>();

@@ -5,7 +5,7 @@ public interface Board {
 
     void addSnake(int start, int end);
 
-    BoardCell getBoardCell(int nextPosition);
+    Cell getBoardCell(int nextPosition);
 
     int getSize();
 }

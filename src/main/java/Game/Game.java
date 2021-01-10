@@ -1,10 +1,7 @@
 package Game;
 
 import Game.GameComponents.*;
-import Game.GameComponents.Board.Board;
-import Game.GameComponents.Board.BoardImpl;
-import Game.GameComponents.Board.Ladder;
-import Game.GameComponents.Board.Snake;
+import Game.GameComponents.Board.*;
 
 import java.util.Iterator;
 import java.util.List;
@@ -12,17 +9,18 @@ import java.util.List;
 public class Game {
 
     Board board;
-    Iterator<Player> playerIterator;
+    PlayerSelector playerSelector;
     List<Player> players;
     Dice dice;
 
     int boardSize = 100;
     int diceSides = 6;
 
-    public Game(Board board, List<Player> players, Dice dice) {
+    public Game(Board board, List<Player> players, Dice dice, PlayerSelector playerSelector) {
         this.board = board;
         this.players = players;
         this.dice = dice;
+        this.playerSelector = playerSelector;
         boardSize = board.getSize();
         diceSides = dice.getSides();
     }
@@ -40,10 +38,7 @@ public class Game {
     }
 
     public Chance play(){
-        if(playerIterator == null || !playerIterator.hasNext())
-            playerIterator = players.iterator();
-
-        Player player = playerIterator.next();
+        Player player = playerSelector.getNextPlayer();
         int diceValue = dice.roll();
 
         Chance chance = new Chance();
@@ -52,21 +47,18 @@ public class Game {
         chance.setInitialPosition(player.getPosition());
 
         int nextPosition = player.getPosition()+diceValue;
-        while (true){
+        while(true){
             if(nextPosition == boardSize){
                 chance.setWonGame(true);
                 break;
             } else if(nextPosition>boardSize){
                 nextPosition = player.getPosition();
                 break;
-            } else if(board.getBoardCell(nextPosition) instanceof Ladder){
-                Ladder ladder = (Ladder) board.getBoardCell(nextPosition);
-                nextPosition = ladder.getEnd();
-            } else if(board.getBoardCell(nextPosition) instanceof Snake){
-                Snake snake = (Snake) board.getBoardCell(nextPosition);
-                nextPosition = snake.getEnd();
             } else {
-                break;
+                Cell cell = board.getBoardCell(nextPosition);
+                if(cell == null)
+                    break;
+                nextPosition = cell.getDestinationCellIndex();
             }
         }
 
